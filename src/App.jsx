@@ -29,7 +29,7 @@ function Row({ row, isLast, open, onToggle }) {
         <div className="breakdown">
           {row.items.map((it, i) => (
             <div className={`item ${it.points > 0 ? 'scored' : ''} ${it.points < 0 ? 'negative' : ''} ${it.warn ? 'warn' : ''}`} key={i}>
-              <span className={`tag tag-${it.kind}`}>{{ team: 'TEAM', player: 'PLAYER', keeper: 'KEEPER', award: 'AWARD', bonus: 'BONUS', ghost: 'GHOST' }[it.kind]}</span>
+              <span className={`tag tag-${it.kind}`}>{{ team: 'TEAM', player: 'PLAYER', keeper: 'KEEPER', award: 'AWARD', bonus: 'BONUS', ghost: 'GHOST', match: 'MATCH' }[it.kind]}</span>
               <span className="item-label">{it.label}</span>
               <span className="item-detail">{it.detail}</span>
               <span className="item-pts">{it.points > 0 ? `+${it.points}` : it.points}</span>
@@ -54,6 +54,8 @@ function Rules() {
           <tr><td>Semi final</td><td>35</td></tr>
           <tr><td>Runner up</td><td>50</td></tr>
           <tr><td>World Cup winner</td><td>75</td></tr>
+          <tr><td>Match win (normal or extra time)</td><td>3</td></tr>
+          <tr><td>Match draw (incl. penalty shootout)</td><td>1</td></tr>
           <tr><td>Goal by your player</td><td>1 each</td></tr>
           <tr><td>Clean sheet by your keeper</td><td>1 each</td></tr>
           <tr><td>Golden Ball / Golden Boot win</td><td>20</td></tr>

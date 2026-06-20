@@ -51,6 +51,7 @@ export default async function handler(req, res) {
         away: { id: m.awayTeam?.id, name: m.awayTeam?.name, tla: m.awayTeam?.tla },
         winner: m.score?.winner || null,
         fullTime: m.score?.fullTime || { home: null, away: null },
+        duration: m.score?.duration || null,
       })),
       scorers: (scorers.scorers || []).map((s) => ({
         player: s.player?.name,

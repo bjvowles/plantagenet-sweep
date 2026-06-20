@@ -1,6 +1,7 @@
 import { DRAW, GHOST_RIDERS } from './data/draw.js';
 import {
   STAGE_POINTS, POINTS, AUSSIE_NATIONS, TEAM_ALIASES, PLAYER_ALIASES, GHOST_KNOCKOUTS,
+  MATCH_RESULT_POINTS, AUSSIE_DOUBLES_MATCH_POINTS,
 } from './data/config.js';
 import { AWARDS, MAD_DOG, ADJUSTMENTS, CLEAN_SHEET_OVERRIDES } from './data/manual.js';
 
@@ -61,6 +62,28 @@ function ghostResults(teamName, matches) {
   return out;
 }
 
+function matchResultPoints(teamName, matches) {
+  const key = norm(teamName);
+  const out = [];
+  for (const m of matches) {
+    if (m.status !== 'FINISHED') continue;
+    const homeIsMine = teamKey(m.home.name) === key;
+    const awayIsMine = teamKey(m.away.name) === key;
+    if (!homeIsMine && !awayIsMine) continue;
+    const isPenalties = m.duration === 'PENALTY_SHOOTOUT';
+    let result, pts;
+    if (isPenalties || m.winner === 'DRAW') {
+      result = 'draw'; pts = POINTS.matchDraw;
+    } else if ((m.winner === 'HOME_TEAM' && homeIsMine) || (m.winner === 'AWAY_TEAM' && awayIsMine)) {
+      result = 'win'; pts = POINTS.matchWin;
+    } else {
+      result = 'loss'; pts = POINTS.matchLoss;
+    }
+    out.push({ stage: m.stage, opp: homeIsMine ? m.away.name : m.home.name, result, pts });
+  }
+  return out;
+}
+
 export function computeLeaderboard(apiData) {
   const matches = apiData?.matches || [];
   const scorers = apiData?.scorers || [];
@@ -93,6 +116,16 @@ export function computeLeaderboard(apiData) {
 
       if (bottom.includes(norm(t)) && prog.points >= STAGE_POINTS.QUARTER_FINALS) {
         items.push({ kind: 'bonus', label: `Dark Horse — ${t}`, detail: 'Bottom-24 seed made the quarters', points: POINTS.darkHorse });
+      }
+
+      // Match result points (win 3 / draw 1 / loss 0)
+      if (MATCH_RESULT_POINTS) {
+        for (const mr of matchResultPoints(t, finished)) {
+          if (mr.pts === 0) continue;
+          const doubleIt = aussie && AUSSIE_DOUBLES_MATCH_POINTS;
+          const pts = mr.pts * (doubleIt ? 2 : 1);
+          items.push({ kind: 'match', label: `${t} vs ${mr.opp}`, detail: `Match ${mr.result}${doubleIt ? ' · AUSSIE 2×' : ''}`, points: pts });
+        }
       }
 
       // Ghost Rider matchups for this team

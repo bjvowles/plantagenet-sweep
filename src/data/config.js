@@ -24,7 +24,17 @@ export const POINTS = {
   ghostWin: 3,    // your team beats an unallocated Ghost Rider (group stage only)
   ghostDraw: 1,
   ghostLoss: -3,
+  matchWin: 3,
+  matchDraw: 1,
+  matchLoss: 0,
 };
+
+// Match result points: win 3 / draw 1 / loss 0, whole tournament.
+// Penalty shootout winner counts as a draw (1) for both teams.
+export const MATCH_RESULT_POINTS = true;
+
+// Aussie Handicap doubles match-result points when true.
+export const AUSSIE_DOUBLES_MATCH_POINTS = true;
 
 // Mad Dog threshold: 5 thumbs up for this comp (family one was 10).
 export const MAD_DOG_THRESHOLD = 5;
