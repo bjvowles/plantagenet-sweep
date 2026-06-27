@@ -17,25 +17,43 @@ function teamKey(apiName) { return norm(TEAM_ALIASES[apiName] || apiName); }
 const isAussie = (n) => AUSSIE_NATIONS.map(norm).includes(norm(n));
 
 const STAGE_ORDER = ['GROUP_STAGE', 'LAST_32', 'LAST_16', 'QUARTER_FINALS', 'SEMI_FINALS', 'THIRD_PLACE', 'FINAL'];
-const STAGE_LABELS = { GROUP_STAGE: 'Group stage', LAST_32: 'Round of 32', LAST_16: 'Round of 16', QUARTER_FINALS: 'Quarter final', SEMI_FINALS: 'Semi final', RUNNER_UP: 'Runner up', WINNER: 'WORLD CUP WINNER' };
+const STAGE_LABELS = { GROUP_STAGE: 'Group stage', LAST_32: 'Round of 32', LAST_16: 'Round of 16', QUARTER_FINALS: 'Quarter final exit' };
 
 function teamProgress(teamName, matches) {
   const key = norm(teamName);
   const mine = matches.filter((m) => teamKey(m.home.name) === key || teamKey(m.away.name) === key);
   if (mine.length === 0) return { points: 0, label: 'No matches found — check team name', found: false };
-  let best = 'GROUP_STAGE', wonFinal = false, lostFinal = false;
-  for (const m of mine) {
-    const stage = m.stage === 'THIRD_PLACE' ? 'SEMI_FINALS' : m.stage;
-    if (STAGE_ORDER.indexOf(stage) > STAGE_ORDER.indexOf(best)) best = stage;
-    if (m.stage === 'FINAL' && m.status === 'FINISHED') {
-      const homeIsMine = teamKey(m.home.name) === key;
-      if ((m.winner === 'HOME_TEAM' && homeIsMine) || (m.winner === 'AWAY_TEAM' && !homeIsMine)) wonFinal = true;
-      else if (m.winner) lostFinal = true;
-    }
+
+  const finalMatch = mine.find((m) => m.stage === 'FINAL');
+  const thirdMatch = mine.find((m) => m.stage === 'THIRD_PLACE');
+
+  // 1. Final finished
+  if (finalMatch?.status === 'FINISHED' && finalMatch.winner) {
+    const homeIsMine = teamKey(finalMatch.home.name) === key;
+    const won = (finalMatch.winner === 'HOME_TEAM' && homeIsMine) || (finalMatch.winner === 'AWAY_TEAM' && !homeIsMine);
+    return won
+      ? { points: STAGE_POINTS.WINNER, label: 'WORLD CUP WINNER', found: true }
+      : { points: STAGE_POINTS.RUNNER_UP, label: 'Runner up', found: true };
   }
-  if (wonFinal) return { points: STAGE_POINTS.WINNER, label: STAGE_LABELS.WINNER, found: true };
-  if (lostFinal) return { points: STAGE_POINTS.RUNNER_UP, label: STAGE_LABELS.RUNNER_UP, found: true };
-  if (best === 'FINAL') return { points: STAGE_POINTS.RUNNER_UP, label: 'Reached the final', found: true };
+  // 2. Third-place playoff finished
+  if (thirdMatch?.status === 'FINISHED' && thirdMatch.winner) {
+    const homeIsMine = teamKey(thirdMatch.home.name) === key;
+    const won = (thirdMatch.winner === 'HOME_TEAM' && homeIsMine) || (thirdMatch.winner === 'AWAY_TEAM' && !homeIsMine);
+    return won
+      ? { points: STAGE_POINTS.THIRD, label: '3rd place', found: true }
+      : { points: STAGE_POINTS.FOURTH, label: '4th place', found: true };
+  }
+  // 3. Final exists but not finished
+  if (finalMatch) return { points: STAGE_POINTS.RUNNER_UP, label: 'Reached the final', found: true };
+  // 4. Semi-finalist awaiting playoff resolution
+  if (mine.some((m) => m.stage === 'SEMI_FINALS' || m.stage === 'THIRD_PLACE')) {
+    return { points: STAGE_POINTS.SEMI_FINALIST, label: 'Semi-finalist', found: true };
+  }
+  // 5. Exit by furthest round reached
+  let best = 'GROUP_STAGE';
+  for (const m of mine) {
+    if (STAGE_ORDER.indexOf(m.stage) > STAGE_ORDER.indexOf(best)) best = m.stage;
+  }
   return { points: STAGE_POINTS[best] ?? 0, label: STAGE_LABELS[best] || best, found: true };
 }
 

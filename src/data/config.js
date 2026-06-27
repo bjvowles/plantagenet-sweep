@@ -2,11 +2,13 @@
 
 export const STAGE_POINTS = {
   GROUP_STAGE: 5,
-  LAST_32: 5,    // 2026 format adds a Round of 32 the rules don't mention; default = group exit.
-  LAST_16: 10,
-  QUARTER_FINALS: 20,
-  SEMI_FINALS: 35,
-  RUNNER_UP: 50,
+  LAST_32: 10,
+  LAST_16: 17,
+  QUARTER_FINALS: 25,
+  SEMI_FINALIST: 25,  // floor while playoff/final not yet resolved
+  FOURTH: 35,
+  THIRD: 45,
+  RUNNER_UP: 60,
   WINNER: 75,
 };
 

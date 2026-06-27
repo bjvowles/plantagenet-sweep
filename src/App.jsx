@@ -48,11 +48,13 @@ function Rules() {
       <p className="rules-note">$5 a head. 10 entrants. $50 in the pot. You hold 4 teams, 2 keepers and 5 players. Points update automatically from match results — awards get entered when FIFA hands them out.</p>
       <table>
         <tbody>
-          <tr><td>Group stage exit (incl. Round of 32 exit)</td><td>5</td></tr>
-          <tr><td>Round of 16</td><td>10</td></tr>
-          <tr><td>Quarter final</td><td>20</td></tr>
-          <tr><td>Semi final</td><td>35</td></tr>
-          <tr><td>Runner up</td><td>50</td></tr>
+          <tr><td>Group stage exit</td><td>5</td></tr>
+          <tr><td>Round of 32 exit</td><td>10</td></tr>
+          <tr><td>Round of 16 exit</td><td>17</td></tr>
+          <tr><td>Quarter final exit</td><td>25</td></tr>
+          <tr><td>4th place (lost 3rd-place playoff)</td><td>35</td></tr>
+          <tr><td>3rd place (won 3rd-place playoff)</td><td>45</td></tr>
+          <tr><td>Runner up</td><td>60</td></tr>
           <tr><td>World Cup winner</td><td>75</td></tr>
           <tr><td>Match win (normal or extra time)</td><td>3</td></tr>
           <tr><td>Match draw (incl. penalty shootout)</td><td>1</td></tr>
